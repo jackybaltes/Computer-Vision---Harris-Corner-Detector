@@ -1,0 +1,1134 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+        <title>Computer Vision - Harris Corner Detector</title>
+
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/ntnuerc.css">
+
+        <!-- Theme used for syntax highlighting of code -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
+        <script src="https://daybrush.com/scenejs/release/latest/dist/scene.min.js"></script>
+		
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
+        <script src="js/ntnu.js"></script>
+    </head>
+    <body>
+        <div class="reveal">
+        <div class="slides">
+            
+<section id="start" data-state="start">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1> Computer Vision - Harris Corner Detector</h1>
+
+   <div class="author" style="text-align:center;">
+    
+<p>
+      Jacky Baltes<br>
+      National Taiwan Normal University<br>
+      Taipei, Taiwan<br>
+      <a href="mailto:jacky.baltes@ntnu.edu.tw">jacky.baltes@ntnu.edu.tw</a><br>
+      17 October 2024
+</p>
+
+   </div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-da9cdba7-a74c-45d2-9054-c6fbd6395cca" ><span id="id-da9cdba7-a74c-45d2-9054-c6fbd6395cca"><img id="img-id-da9cdba7-a74c-45d2-9054-c6fbd6395cca"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-1c88b6d1-408e-4697-9015-310d6bec6629" ><span id="id-1c88b6d1-408e-4697-9015-310d6bec6629"><img id="img-id-1c88b6d1-408e-4697-9015-310d6bec6629" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="ShowImage" data-state="ShowImage">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+<div class="jb-input jb-render jb-code" style="text-align:center">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-input-code jb-render">
+<div class="highlight" style="background: #f8f8f8; color:#101010;display=inline-block;"><pre style="line-height: 125%;"><span></span><span style="color: #008000; font-weight: bold">import</span> <span style="color: #0000FF; font-weight: bold">PIL</span>
+
+fig <span style="color: #666666">=</span> plt<span style="color: #666666">.</span>figure()
+ax <span style="color: #666666">=</span> fig<span style="color: #666666">.</span>add_subplot(<span style="color: #666666">1</span>,<span style="color: #666666">1</span>,<span style="color: #666666">1</span>)
+
+im <span style="color: #666666">=</span> PIL<span style="color: #666666">.</span>Image<span style="color: #666666">.</span>open( <span style="color: #008000">str</span>(bogie<span style="color: #666666">.</span>localFileStem) <span style="color: #666666">+</span> <span style="color: #BA2121">&quot;.&quot;</span> <span style="color: #666666">+</span> bogie<span style="color: #666666">.</span>suffix )
+img <span style="color: #666666">=</span> np<span style="color: #666666">.</span>asarray(im)
+ax<span style="color: #666666">.</span>set_xticks([])
+ax<span style="color: #666666">.</span>set_yticks([])
+ax<span style="color: #666666">.</span>imshow(img)
+
+fig100 <span style="color: #666666">=</span> addJBFigure(<span style="color: #BA2121">&quot;fig100&quot;</span>, <span style="color: #666666">0</span>, <span style="color: #666666">0</span>, fig)
+plt<span style="color: #666666">.</span>close()
+</pre></div>
+
+</div><!-- end of jb-input-code jb-render -->
+
+</div>
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-a1d1f44e-bb0f-40d4-ab95-7488349ef05d" ><span id="id-a1d1f44e-bb0f-40d4-ab95-7488349ef05d"><img id="img-id-a1d1f44e-bb0f-40d4-ab95-7488349ef05d"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-f73955b7-1d95-4f47-a3d0-3e1b8cfa19b8" ><span id="id-f73955b7-1d95-4f47-a3d0-3e1b8cfa19b8"><img id="img-id-f73955b7-1d95-4f47-a3d0-3e1b8cfa19b8" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00004_frag_00001" data-state="slide_00004_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<span id="id-61b3d097-69f3-412e-9936-2eaf84b5a486" ><span id="id-61b3d097-69f3-412e-9936-2eaf84b5a486"><img id="img-id-61b3d097-69f3-412e-9936-2eaf84b5a486"     src="assets/images/fig100.svg"/></span>
+</span>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-06b14967-488d-47f9-aac0-0682784177ae" ><span id="id-06b14967-488d-47f9-aac0-0682784177ae"><img id="img-id-06b14967-488d-47f9-aac0-0682784177ae"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-7703a609-f3ec-4171-8bdb-ec261db79af6" ><span id="id-7703a609-f3ec-4171-8bdb-ec261db79af6"><img id="img-id-7703a609-f3ec-4171-8bdb-ec261db79af6" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00005_frag_00001" data-state="slide_00005_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Corners</h1>
+
+<div class="jb-text">
+<ul>
+<li>Edges allow us to localize points only in one direction (perpendicular to the edge)</li>
+<li>Use corners to uniquely identify and localize points in the image</li>
+<li>Constructive definition: corners are points that are different from its surroundings</li>
+<li>A corner is a point, where the patch around the point can be localized (i.e., very different when shifted)</li>
+<li>
+Define the difference as the sum of the squared differences between the corner patch and the neighborhood patches</li>
+<li>
+\[
+  S(\Delta x, \Delta y) = \sum_x \sum_y w(x,y)( I(x+\Delta x, y + \Delta y) - I(x,y) )^2
+\]
+. where \( w(x,y) \) is a weighing function for different pixels
+</li>
+<li>Efficient implementation of function \( S \) depends on the derivative of the image function</li>
+</ul>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-f1dc58ff-1cc1-49d8-993e-d3107f275420" ><span id="id-f1dc58ff-1cc1-49d8-993e-d3107f275420"><img id="img-id-f1dc58ff-1cc1-49d8-993e-d3107f275420"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-a994c2bf-9e78-4720-a46e-e77d6354ec84" ><span id="id-a994c2bf-9e78-4720-a46e-e77d6354ec84"><img id="img-id-a994c2bf-9e78-4720-a46e-e77d6354ec84" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00006_frag_00001" data-state="slide_00006_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Taylor Expansion</h1>
+
+<div class="jb-text">
+<p>Taylor expansion/series is a way to represent the neighborhood \( x \) 
+of a function \( f \) that
+is known at a given point \( a \).</p>
+<p>Taylor series is an infinite sum of the form: 
+\[
+  f(x) \approx f(a) + \frac{f'(a)}{1!}(x-a) + \frac{ f''(a)}{2!}(x-a)^2 + \frac{ f'''(a)}{3!}(x-a)^3 + ... 
+\]
+</p>
+<p>We can replace \( (x - a) \) with \( \Delta x \)
+\[
+  f(x) \approx f(a) + \frac{f'(a)}{1!}\Delta x + \frac{ f''(a)}{2!}(\Delta x)^2 + \frac{ f'''(a)}{3!}(\Delta x)^3 + ... 
+\]
+</p>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-75ec651b-a546-41cf-92de-cd343c0c85cb" ><span id="id-75ec651b-a546-41cf-92de-cd343c0c85cb"><img id="img-id-75ec651b-a546-41cf-92de-cd343c0c85cb"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-ae3a73a1-1399-4171-bf65-0865a155e213" ><span id="id-ae3a73a1-1399-4171-bf65-0865a155e213"><img id="img-id-ae3a73a1-1399-4171-bf65-0865a155e213" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00007_frag_00001" data-state="slide_00007_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Taylor Expansion in 2D</h1>
+
+<div class="jb-text" style="font-size:0.5em">
+<p>Extend the idea to 2D functions (for images)</p>
+<p>\[
+f(x + \Delta x,y + \Delta y) = f(x,y) + \Delta x f_x(x,y) + \Delta y f_y(x,y) \\
++ \frac{1}{2!} [ \Delta x^2 f_{xx}(x,y) + \Delta x \Delta y f_xy(x,y) \Delta y^2 f_yy(x,y) ] \\
++ \frac{1}{3!} [ \Delta x^3 f_{xxx}(x,y) + \Delta x^2 \Delta y f_xxy(x,y) + \Delta x \Delta y^2 f_xyy(x,y) ...  +
+\]
+</p>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-c48709e0-0ce4-4e55-bc76-50f03f6ccbb4" ><span id="id-c48709e0-0ce4-4e55-bc76-50f03f6ccbb4"><img id="img-id-c48709e0-0ce4-4e55-bc76-50f03f6ccbb4"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-a8cc3ca4-a055-4630-a76e-36186b03ad68" ><span id="id-a8cc3ca4-a055-4630-a76e-36186b03ad68"><img id="img-id-a8cc3ca4-a055-4630-a76e-36186b03ad68" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00008_frag_00001" data-state="slide_00008_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Taylor Expansion in 2D</h1>
+
+<div class="jb-text" style="font-size:0.5em">
+<p>Extend the idea to 2D functions (for images)</p>
+<p>\[
+f(x + \Delta x,y + \Delta y) = f(x,y) + \Delta x f_x(x,y) + \Delta y f_y(x,y) \\
++ \frac{1}{2!} [ \Delta x^2 f_{xx}(x,y) + \Delta x \Delta y f_xy(x,y) + \Delta y^2 f_yy(x,y) ] \\
++ \frac{1}{3!} [ \Delta x^3 f_{xxx}(x,y) + \Delta x^2 \Delta y f_xxy(x,y) + \Delta x \Delta y^2 f_xyy(x,y) ...  +
+\]
+</p>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-2c213ad5-1f78-4f68-a273-92f09919018c" ><span id="id-2c213ad5-1f78-4f68-a273-92f09919018c"><img id="img-id-2c213ad5-1f78-4f68-a273-92f09919018c"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-f4e36c24-c9c9-46d8-8b68-da6127c197fe" ><span id="id-f4e36c24-c9c9-46d8-8b68-da6127c197fe"><img id="img-id-f4e36c24-c9c9-46d8-8b68-da6127c197fe" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00009_frag_00001" data-state="slide_00009_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Taylor Expansion in 2D</h1>
+
+<div class="jb-text" style="font-size:0.5em">
+<p>Extend the idea to 2D functions (for images)</p>
+<p>\[
+f(x + \Delta x,y + \Delta y) = f(x,y) + \Delta x f_x(x,y) + \Delta y f_y(x,y) \\
++ \frac{1}{2!} [ \Delta x^2 f_{xx}(x,y) + \Delta x \Delta y f_{xy}(x,y) + \Delta y^2 f_{yy}(x,y) ] \\
++ \frac{1}{3!} [ \Delta x^3 f_{xxx}(x,y) + \Delta x^2 \Delta y f_{xxy}(x,y) + \Delta x \Delta y^2 f_{xyy}(x,y) ...  +
+\]
+</p>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-1e8e2240-497e-4a7c-a8ec-11de1971eca4" ><span id="id-1e8e2240-497e-4a7c-a8ec-11de1971eca4"><img id="img-id-1e8e2240-497e-4a7c-a8ec-11de1971eca4"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-252195d6-3bfd-4907-8d9b-c8ea47bfe26e" ><span id="id-252195d6-3bfd-4907-8d9b-c8ea47bfe26e"><img id="img-id-252195d6-3bfd-4907-8d9b-c8ea47bfe26e" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00010_frag_00001" data-state="slide_00010_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Harris Corner Detector</h1>
+
+<div class="jb-text" style="font-size:0.5em">
+<p>Use only the first derivative of the 2D expansion</p>
+\[
+I(x+\Delta x, y + \Delta y) = I(x,y) + \Delta x I_x(x,y) + \Delta y I_y(x,y)
+\]
+\[
+S(\Delta x, \Delta y) \approx \sum_x \sum_y w(x,y)(I(x,y) + \Delta x I_x(x,y) + \Delta y I_y(x,y) - I(x,y))^2\\
+\approx \sum_x \sum_y w(x,y)(\Delta x I_x(x,y) + \Delta y I_y(x,y))^2\\
+\approx \sum_x \sum_y w(x,y)(\Delta x^2 I_x(x,y)^2 + 2 \Delta x \Delta y I_x(x,y) I_y(x,y) + \Delta y^2 I_y(x,y)^2)
+\]
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-fc6045a4-b7b2-4485-9d45-18d22036efec" ><span id="id-fc6045a4-b7b2-4485-9d45-18d22036efec"><img id="img-id-fc6045a4-b7b2-4485-9d45-18d22036efec"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-ea8a02cf-232a-4c02-8234-4e1c451c3313" ><span id="id-ea8a02cf-232a-4c02-8234-4e1c451c3313"><img id="img-id-ea8a02cf-232a-4c02-8234-4e1c451c3313" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00011_frag_00001" data-state="slide_00011_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>2D Taylor Series and Images</h1>
+
+<div class="jb-text" style="font-size:0.5em">
+\[
+  S( \Delta x, \Delta y ) \approx \sum_x \sum_y w(x,y) [ \Delta x \; \Delta y] \left[ \begin{array} \\ I_x(x,y)^2 & I_x(x,y) I_y(x,y) \\ I_x(x,y) I_y(x,y) & I_y(x,y)^2 \end{array} \right] \left[ \begin{array} \\ \Delta x \\ \Delta y \end{array} \right] \\
+  \approx [\Delta x \; \Delta y] \left( \sum_x \sum_y w(x,y) \left[ \begin{array} \\ I_x(x,y)^2 & I_x(x,y) I_y(x,y) \\ I_x(x,y) I_y(x,y) & I_y(x,y)^2 \end{array} \right] \right) \left[ \begin{array} \\ \Delta x \\ \Delta y \end{array} \right]
+\]
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-64e5bb5c-7a1e-46bb-8ef2-4c408fb5b968" ><span id="id-64e5bb5c-7a1e-46bb-8ef2-4c408fb5b968"><img id="img-id-64e5bb5c-7a1e-46bb-8ef2-4c408fb5b968"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-6abcd0c3-46b7-4b44-9c1b-f1c1cfaa7f95" ><span id="id-6abcd0c3-46b7-4b44-9c1b-f1c1cfaa7f95"><img id="img-id-6abcd0c3-46b7-4b44-9c1b-f1c1cfaa7f95" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00012_frag_00001" data-state="slide_00012_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<div class="jb-text">
+\[
+  S(\Delta x, \Delta y) \approx [\Delta x \; \Delta y] M \left[ \begin{array} \\ \Delta x \\ \Delta y \end{array} \right]
+\]
+
+<p>M looks like this</p>
+\[
+M \approx \sum_x \sum_y w(x,y) \left[ \begin{array} \\ I_x(x,y)^2 & I_x(x,y) I_y(x,y) \\ I_x(x,y) I_y(x,y) & I_y(x,y)^2 \end{array} \right]
+\]
+
+<p>\( w(x,y) \) is weighting function, but in general, we just set it to 1 for pixels in the neighborhood</p>
+<p>\( I_x \) and \( I_y \) are the partial derivatives in x and y direction, often calculated using the Sobel edge detector</p> 
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-244b2d57-6449-4677-965c-6f101a776a66" ><span id="id-244b2d57-6449-4677-965c-6f101a776a66"><img id="img-id-244b2d57-6449-4677-965c-6f101a776a66"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-708fd08f-f23f-4425-a53c-d255c1f3cfa3" ><span id="id-708fd08f-f23f-4425-a53c-d255c1f3cfa3"><img id="img-id-708fd08f-f23f-4425-a53c-d255c1f3cfa3" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00013_frag_00001" data-state="slide_00013_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Corner Response</h1>
+
+<div class="jb-text">
+<p>Define R as \( det M - k (trace M )^2 \), where \( k \) is a parameter 0.04 to 0.06</p>
+<p>
+If \( R \) is large and positive, then we found a corner
+</p>
+<p>
+If \( R \) is large and negative, then we found an edge
+</p>
+<p>
+If \( R \) is small, then we found a uniform region
+</p>
+</div>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-d8ade3c0-8afa-4d7a-a458-ec9caa85b73a" ><span id="id-d8ade3c0-8afa-4d7a-a458-ec9caa85b73a"><img id="img-id-d8ade3c0-8afa-4d7a-a458-ec9caa85b73a"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-1b420d83-3b69-4c8a-9470-bae560c5f0d6" ><span id="id-1b420d83-3b69-4c8a-9470-bae560c5f0d6"><img id="img-id-1b420d83-3b69-4c8a-9470-bae560c5f0d6" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00014_frag_00001" data-state="slide_00014_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+<div class="jb-input jb-render jb-code" style="text-align:center">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-input-code jb-render">
+<div class="highlight" style="background: #f8f8f8; color:#101010;display=inline-block;"><pre style="line-height: 125%;"><span></span>Sobel_x <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array([[<span style="color: #666666">+1</span>, <span style="color: #666666">0</span>, <span style="color: #666666">-1</span>],\
+                    [<span style="color: #666666">+2</span>, <span style="color: #666666">0</span>, <span style="color: #666666">-2</span>],\
+                    [<span style="color: #666666">+1</span>, <span style="color: #666666">0</span>, <span style="color: #666666">-1</span>]])
+
+Sobel_y <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array([[<span style="color: #666666">+1</span>, <span style="color: #666666">+2</span>, <span style="color: #666666">+1</span>],\
+                    [ <span style="color: #666666">0</span>,  <span style="color: #666666">0</span>,  <span style="color: #666666">0</span>],\
+                    [<span style="color: #666666">-1</span>, <span style="color: #666666">-2</span>, <span style="color: #666666">-1</span>]])
+
+img_dx <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros( (img<span style="color: #666666">.</span>shape[<span style="color: #666666">0</span>]<span style="color: #666666">-2</span>,img<span style="color: #666666">.</span>shape[<span style="color: #666666">1</span>]<span style="color: #666666">-2</span>) )
+img_dy <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros( (img<span style="color: #666666">.</span>shape[<span style="color: #666666">0</span>]<span style="color: #666666">-2</span>,img<span style="color: #666666">.</span>shape[<span style="color: #666666">1</span>]<span style="color: #666666">-2</span>) )
+
+<span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(img<span style="color: #666666">.</span>shape[<span style="color: #666666">0</span>]<span style="color: #666666">-2</span>):
+  <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(img<span style="color: #666666">.</span>shape[<span style="color: #666666">1</span>]<span style="color: #666666">-2</span>):
+    img_dx[i,j] <span style="color: #666666">=</span> <span style="color: #008000">sum</span>( <span style="color: #008000">sum</span>( Sobel_x<span style="color: #666666">*</span>img[i:i<span style="color: #666666">+3</span>,j:j<span style="color: #666666">+3</span>, <span style="color: #666666">1</span>] ) )
+    img_dy[i,j] <span style="color: #666666">=</span> <span style="color: #008000">sum</span>( <span style="color: #008000">sum</span>( Sobel_y<span style="color: #666666">*</span>img[i:i<span style="color: #666666">+3</span>,j:j<span style="color: #666666">+3</span>, <span style="color: #666666">1</span>] ) )
+</pre></div>
+
+</div><!-- end of jb-input-code jb-render -->
+
+</div>
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-66baf927-2650-448c-be83-cfcdf2d09a71" ><span id="id-66baf927-2650-448c-be83-cfcdf2d09a71"><img id="img-id-66baf927-2650-448c-be83-cfcdf2d09a71"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-bbc643d0-8a28-4df3-a005-ae8f1ae94f09" ><span id="id-bbc643d0-8a28-4df3-a005-ae8f1ae94f09"><img id="img-id-bbc643d0-8a28-4df3-a005-ae8f1ae94f09" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00015_frag_00001" data-state="slide_00015_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+<div class="jb-input jb-render jb-code" style="text-align:center">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-input-code jb-render">
+<div class="highlight" style="background: #f8f8f8; color:#101010;display=inline-block;"><pre style="line-height: 125%;"><span></span>fig <span style="color: #666666">=</span> plt<span style="color: #666666">.</span>figure( dpi<span style="color: #666666">=300</span> )
+ax1 <span style="color: #666666">=</span> fig<span style="color: #666666">.</span>add_subplot( <span style="color: #666666">1</span>,<span style="color: #666666">2</span>,<span style="color: #666666">1</span> )
+ax1<span style="color: #666666">.</span>set_title( <span style="color: #BA2121">&quot;Sobel X&quot;</span>)
+ax1<span style="color: #666666">.</span>imshow( img_dx, cmap<span style="color: #666666">=</span><span style="color: #BA2121">&#39;gray&#39;</span> )
+
+ax2 <span style="color: #666666">=</span> fig<span style="color: #666666">.</span>add_subplot( <span style="color: #666666">1</span>,<span style="color: #666666">2</span>,<span style="color: #666666">2</span> )
+ax2<span style="color: #666666">.</span>set_title( <span style="color: #BA2121">&#39;Sobel Y&#39;</span>)
+ax2<span style="color: #666666">.</span>imshow( img_dy, cmap<span style="color: #666666">=</span><span style="color: #BA2121">&#39;gray&#39;</span> )
+
+f200 <span style="color: #666666">=</span> addJBFigure(<span style="color: #BA2121">&quot;f200&quot;</span>, <span style="color: #666666">0</span>, <span style="color: #666666">0</span>, fig)
+plt<span style="color: #666666">.</span>close()
+</pre></div>
+
+</div><!-- end of jb-input-code jb-render -->
+
+</div>
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-917ee362-d937-4965-8656-db18a78ea316" ><span id="id-917ee362-d937-4965-8656-db18a78ea316"><img id="img-id-917ee362-d937-4965-8656-db18a78ea316"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-be891716-f043-4e7b-b62c-cbf3e9f31668" ><span id="id-be891716-f043-4e7b-b62c-cbf3e9f31668"><img id="img-id-be891716-f043-4e7b-b62c-cbf3e9f31668" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00016_frag_00001" data-state="slide_00016_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<span id="id-40540e53-7fd1-4974-ab76-836a8d1082b4" ><span id="id-40540e53-7fd1-4974-ab76-836a8d1082b4"><img id="img-id-40540e53-7fd1-4974-ab76-836a8d1082b4"     src="assets/images/f200.svg"/></span>
+</span>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-72646916-f656-440c-8990-5f2c5b182591" ><span id="id-72646916-f656-440c-8990-5f2c5b182591"><img id="img-id-72646916-f656-440c-8990-5f2c5b182591"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-089156bb-cbb7-41ac-a00c-1d797d7d8b10" ><span id="id-089156bb-cbb7-41ac-a00c-1d797d7d8b10"><img id="img-id-089156bb-cbb7-41ac-a00c-1d797d7d8b10" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00017_frag_00001" data-state="slide_00017_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+<div class="jb-input jb-render jb-code" style="text-align:center">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-input-code jb-render">
+<div class="highlight" style="background: #f8f8f8; color:#101010;display=inline-block;"><pre style="line-height: 125%;"><span></span>img_dx2 <span style="color: #666666">=</span> img_dx <span style="color: #666666">*</span> img_dx
+img_dy2 <span style="color: #666666">=</span> img_dy <span style="color: #666666">*</span> img_dy
+img_dxdy <span style="color: #666666">=</span> img_dx <span style="color: #666666">*</span> img_dy
+
+w <span style="color: #666666">=</span> np<span style="color: #666666">.</span>ones( (<span style="color: #666666">9</span>,<span style="color: #666666">9</span>) )
+k <span style="color: #666666">=</span> <span style="color: #666666">0.05</span>
+
+harris <span style="color: #666666">=</span> np<span style="color: #666666">.</span>zeros((img_dx<span style="color: #666666">.</span>shape[<span style="color: #666666">0</span>]<span style="color: #666666">-8</span>, img_dy<span style="color: #666666">.</span>shape[<span style="color: #666666">1</span>]<span style="color: #666666">-8</span>))
+<span style="color: #008000; font-weight: bold">for</span> i <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(img_dx<span style="color: #666666">.</span>shape[<span style="color: #666666">0</span>]<span style="color: #666666">-8</span>):
+  <span style="color: #008000; font-weight: bold">for</span> j <span style="color: #AA22FF; font-weight: bold">in</span> <span style="color: #008000">range</span>(img_dx<span style="color: #666666">.</span>shape[<span style="color: #666666">1</span>]<span style="color: #666666">-8</span>):
+    a <span style="color: #666666">=</span> <span style="color: #008000">sum</span>(<span style="color: #008000">sum</span>(w<span style="color: #666666">*</span>img_dx2[i:i<span style="color: #666666">+9</span>,j:j<span style="color: #666666">+9</span>]))
+    b <span style="color: #666666">=</span> <span style="color: #008000">sum</span>(<span style="color: #008000">sum</span>(w<span style="color: #666666">*</span>img_dxdy[i:i<span style="color: #666666">+9</span>,j:j<span style="color: #666666">+9</span>]))
+    c <span style="color: #666666">=</span> b
+    d <span style="color: #666666">=</span> <span style="color: #008000">sum</span>(<span style="color: #008000">sum</span>(w<span style="color: #666666">*</span>img_dy2[i:i<span style="color: #666666">+9</span>,j:j<span style="color: #666666">+9</span>]))
+    M <span style="color: #666666">=</span> np<span style="color: #666666">.</span>array(([[a,b],\
+                   [c,d]]))
+    R <span style="color: #666666">=</span> a <span style="color: #666666">*</span> d <span style="color: #666666">-</span> b <span style="color: #666666">*</span> c <span style="color: #666666">-</span> k<span style="color: #666666">*</span>( a <span style="color: #666666">+</span> d )<span style="color: #666666">**2</span>
+    harris[i,j] <span style="color: #666666">=</span> R
+</pre></div>
+
+</div><!-- end of jb-input-code jb-render -->
+
+</div>
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-9b5d3092-8e86-4858-b56a-c4c44b29b717" ><span id="id-9b5d3092-8e86-4858-b56a-c4c44b29b717"><img id="img-id-9b5d3092-8e86-4858-b56a-c4c44b29b717"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-f4c0be9e-88ba-4e31-a4fc-989cc0efcab9" ><span id="id-f4c0be9e-88ba-4e31-a4fc-989cc0efcab9"><img id="img-id-f4c0be9e-88ba-4e31-a4fc-989cc0efcab9" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00018_frag_00001" data-state="slide_00018_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+<div class="jb-input jb-render jb-code" style="text-align:center">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-input-code jb-render">
+<div class="highlight" style="background: #f8f8f8; color:#101010;display=inline-block;"><pre style="line-height: 125%;"><span></span>fig <span style="color: #666666">=</span> plt<span style="color: #666666">.</span>figure()
+ax <span style="color: #666666">=</span> fig<span style="color: #666666">.</span>add_subplot(<span style="color: #666666">1</span>,<span style="color: #666666">1</span>,<span style="color: #666666">1</span>)
+
+ax<span style="color: #666666">.</span>imshow( harris )
+
+h1 <span style="color: #666666">=</span> addJBFigure(<span style="color: #BA2121">&quot;h1&quot;</span>, <span style="color: #666666">0</span>, <span style="color: #666666">0</span>, fig )
+plt<span style="color: #666666">.</span>close()
+</pre></div>
+
+</div><!-- end of jb-input-code jb-render -->
+
+</div>
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-0acd8db1-48a9-4685-abd6-7a3cebf70104" ><span id="id-0acd8db1-48a9-4685-abd6-7a3cebf70104"><img id="img-id-0acd8db1-48a9-4685-abd6-7a3cebf70104"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-9493e66a-3d5e-4417-af8e-791ef4de8515" ><span id="id-9493e66a-3d5e-4417-af8e-791ef4de8515"><img id="img-id-9493e66a-3d5e-4417-af8e-791ef4de8515" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+<section id="slide_00019_frag_00001" data-state="slide_00019_frag_00001">
+
+
+<!-- Header -->
+  
+
+<!-- Background -->
+
+
+<!-- Slide -->
+<div class="jb-slide">
+
+<div class="jb-output-code jb-render">
+
+<!-- start embedded style -->
+
+<!-- end embedded style -->
+<div class="jb-output jb-render">
+
+<h1>Out of Harris Corner Detector</h1>
+
+<span id="id-265e3fe1-489f-4d56-9fe5-7f2c8b5a8f33" ><span id="id-265e3fe1-489f-4d56-9fe5-7f2c8b5a8f33"><img id="img-id-265e3fe1-489f-4d56-9fe5-7f2c8b5a8f33"     src="assets/images/h1.svg"/></span>
+</span>
+
+</div><!-- end of jb-output jb-render -->
+</div><!-- end of jb-output-code jb-render -->
+
+
+</div>
+<!-- Footer -->
+
+<div class="jb-footer-left plain">
+    <span id="id-adba7675-a0c6-4c06-ba77-931938546de0" ><span id="id-adba7675-a0c6-4c06-ba77-931938546de0"><img id="img-id-adba7675-a0c6-4c06-ba77-931938546de0"     src="assets/images/logo.png"/></span>
+</span>
+
+</div>
+<div class="jb-footer-right plain">
+    <span id="id-9bf7c640-27b7-498e-aafa-d3d6c5e32b57" ><span id="id-9bf7c640-27b7-498e-aafa-d3d6c5e32b57"><img id="img-id-9bf7c640-27b7-498e-aafa-d3d6c5e32b57" width="162" height="138"   src="assets/images/robbi.png"/></span>
+</span>
+
+</div>
+
+<aside class="notes">
+
+</aside>
+
+
+
+</section>
+        </div>
+        </div>
+
+        <script src="js/reveal.js"></script>
+
+        <script>
+            // More info about config & dependencies:
+            // - https://github.com/hakimel/reveal.js#configuration
+            // - https://github.com/hakimel/reveal.js#dependencies
+            Reveal.initialize({
+                math: {
+                    mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+                    config: 'TeX-AMS_HTML-full',  // See http://docs.mathjax.org/en/latest/config-files.html
+                    // tex2jax: {
+                    //     inlineMath: [['$', '$'], ['\(', '\)']],
+                    //     displayMath: [['$$', '$$'], ['\[', '\]']],
+                    //     processEscapes: true,
+                    //     processEnvironments: true,
+                    //     skipTags: ['script', 'noscript', 'style', 'textarea', 'code', 'pre'],
+                    //     displayAlign: 'center',
+                    // }                
+                },
+                dependencies: [
+                    { src: 'plugin/markdown/marked.js' },
+                    { src: 'plugin/markdown/markdown.js' },
+                    { src: 'plugin/notes/notes.js', async: true },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/math/math.js', async: true }
+                ]
+            });
+        </script>
+
+        <script>
+            <!-- Assets -->
+var assets = {
+"robbi" : new JBImage( "robbi", "12677", "162", "138", null, null, "assets/images/robbi", "png" ),
+"logo" : new JBImage( "logo", "12033", "0", "0", null, null, "assets/images/logo", "png" ),
+"fira-logo-1" : new JBImage( "fira-logo-1", "93836", "0", "0", null, null, "assets/images/FIRA-logo-1", "png" ),
+"pairLogo" : new JBImage( "pairLogo", "63051", "0", "0", null, null, "assets/images/pairLogo", "png" ),
+"bogie" : new JBImage( "bogie", "701605", "0", "0", "http://www.doctormacro.com/Images/Bogart,%20Humphrey/Annex/Annex%20-%20Bogart,%20Humphrey%20(Casablanca)_16.jpg", null, "assets/images/bogie", "jpg" ),
+"fig100" : new JBImage( "fig100", "1254387", "0", "0", null, null, "assets/images/fig100", "svg" ),
+"f200" : new JBImage( "f200", "606858", "0", "0", null, null, "assets/images/f200", "svg" ),
+"h1" : new JBImage( "h1", "224721", "0", "0", null, null, "assets/images/h1", "svg" ) 
+};
+var assetInstances = {
+    "id-1c88b6d1-408e-4697-9015-310d6bec6629": assets["robbi"],
+    "id-f73955b7-1d95-4f47-a3d0-3e1b8cfa19b8": assets["robbi"],
+    "id-7703a609-f3ec-4171-8bdb-ec261db79af6": assets["robbi"],
+    "id-a994c2bf-9e78-4720-a46e-e77d6354ec84": assets["robbi"],
+    "id-ae3a73a1-1399-4171-bf65-0865a155e213": assets["robbi"],
+    "id-a8cc3ca4-a055-4630-a76e-36186b03ad68": assets["robbi"],
+    "id-f4e36c24-c9c9-46d8-8b68-da6127c197fe": assets["robbi"],
+    "id-252195d6-3bfd-4907-8d9b-c8ea47bfe26e": assets["robbi"],
+    "id-ea8a02cf-232a-4c02-8234-4e1c451c3313": assets["robbi"],
+    "id-6abcd0c3-46b7-4b44-9c1b-f1c1cfaa7f95": assets["robbi"],
+    "id-708fd08f-f23f-4425-a53c-d255c1f3cfa3": assets["robbi"],
+    "id-1b420d83-3b69-4c8a-9470-bae560c5f0d6": assets["robbi"],
+    "id-bbc643d0-8a28-4df3-a005-ae8f1ae94f09": assets["robbi"],
+    "id-be891716-f043-4e7b-b62c-cbf3e9f31668": assets["robbi"],
+    "id-089156bb-cbb7-41ac-a00c-1d797d7d8b10": assets["robbi"],
+    "id-f4c0be9e-88ba-4e31-a4fc-989cc0efcab9": assets["robbi"],
+    "id-9493e66a-3d5e-4417-af8e-791ef4de8515": assets["robbi"],
+    "id-9bf7c640-27b7-498e-aafa-d3d6c5e32b57": assets["robbi"],
+    "id-da9cdba7-a74c-45d2-9054-c6fbd6395cca": assets["logo"],
+    "id-a1d1f44e-bb0f-40d4-ab95-7488349ef05d": assets["logo"],
+    "id-06b14967-488d-47f9-aac0-0682784177ae": assets["logo"],
+    "id-f1dc58ff-1cc1-49d8-993e-d3107f275420": assets["logo"],
+    "id-75ec651b-a546-41cf-92de-cd343c0c85cb": assets["logo"],
+    "id-c48709e0-0ce4-4e55-bc76-50f03f6ccbb4": assets["logo"],
+    "id-2c213ad5-1f78-4f68-a273-92f09919018c": assets["logo"],
+    "id-1e8e2240-497e-4a7c-a8ec-11de1971eca4": assets["logo"],
+    "id-fc6045a4-b7b2-4485-9d45-18d22036efec": assets["logo"],
+    "id-64e5bb5c-7a1e-46bb-8ef2-4c408fb5b968": assets["logo"],
+    "id-244b2d57-6449-4677-965c-6f101a776a66": assets["logo"],
+    "id-d8ade3c0-8afa-4d7a-a458-ec9caa85b73a": assets["logo"],
+    "id-66baf927-2650-448c-be83-cfcdf2d09a71": assets["logo"],
+    "id-917ee362-d937-4965-8656-db18a78ea316": assets["logo"],
+    "id-72646916-f656-440c-8990-5f2c5b182591": assets["logo"],
+    "id-9b5d3092-8e86-4858-b56a-c4c44b29b717": assets["logo"],
+    "id-0acd8db1-48a9-4685-abd6-7a3cebf70104": assets["logo"],
+    "id-adba7675-a0c6-4c06-ba77-931938546de0": assets["logo"],
+    "id-61b3d097-69f3-412e-9936-2eaf84b5a486": assets["fig100"],
+    "id-40540e53-7fd1-4974-ab76-836a8d1082b4": assets["f200"],
+    "id-265e3fe1-489f-4d56-9fe5-7f2c8b5a8f33": assets["h1"]
+};
+<!-- End of Assets -->
+
+            convertURLs(assetInstances, "smart-path");
+        </script>
+        <script>
+            <!-- Characters -->
+var characters =
+{};
+<!-- End of Characters -->
+
+        </script>
+    </body>
+</html>
